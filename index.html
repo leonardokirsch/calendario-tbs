@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendário de conteúdo — The Best Speaker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#E8ECF4;
+  --bg-2:#D9E0EE;
+  --ink:#101B3D;
+  --ink-soft:#56628A;
+  --ink-faint:#8E98B6;
+  --glass:rgba(255,255,255,.55);
+  --glass-strong:rgba(255,255,255,.82);
+  --line:rgba(16,27,61,.10);
+  --cell-hover:rgba(16,27,61,.05);
+  --orb-a:rgba(255,122,26,.35);
+  --orb-b:rgba(90,122,220,.35);
+  --shadow:0 40px 80px -30px rgba(16,27,61,.35);
+  --hot-1:#FF8A1F;
+  --hot-2:#FF4D2E;
+  --on-hot:#FFFFFF;
+  --st-0:#9AA3BD;
+  --st-1:#F2B33D;
+  --st-2:#4C7DF0;
+  --st-3:#2FB47C;
+  --field:rgba(255,255,255,.7);
+  --draft:rgba(255,255,255,.75);
+  --draft-hover:rgba(255,255,255,.95);
+  --scrim:rgba(16,27,61,.35);
+  --ev-mont:#2FA8A0;
+  --ev-grav:#7B6CF0;
+  --ev-final:#E2457E;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1430;--bg-2:#121D44;--ink:#F2F4FA;--ink-soft:#A8B2CF;--ink-faint:#6E7AA0;
+    --glass:rgba(255,255,255,.06);--glass-strong:rgba(22,32,72,.92);--line:rgba(255,255,255,.09);
+    --cell-hover:rgba(255,255,255,.05);--orb-a:rgba(255,110,30,.30);--orb-b:rgba(70,100,220,.35);
+    --shadow:0 40px 90px -30px rgba(0,0,0,.6);--field:rgba(255,255,255,.06);--scrim:rgba(5,9,25,.6);--draft:rgba(255,255,255,.075);--draft-hover:rgba(255,255,255,.12);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1430;--bg-2:#121D44;--ink:#F2F4FA;--ink-soft:#A8B2CF;--ink-faint:#6E7AA0;
+  --glass:rgba(255,255,255,.06);--glass-strong:rgba(22,32,72,.92);--line:rgba(255,255,255,.09);
+  --cell-hover:rgba(255,255,255,.05);--orb-a:rgba(255,110,30,.30);--orb-b:rgba(70,100,220,.35);
+  --shadow:0 40px 90px -30px rgba(0,0,0,.6);--field:rgba(255,255,255,.06);--scrim:rgba(5,9,25,.6);--draft:rgba(255,255,255,.075);--draft-hover:rgba(255,255,255,.12);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;font-family:var(--font);color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orbs i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.7}
+.orbs i:nth-child(1){width:46vmax;height:46vmax;background:var(--orb-a);top:-18vmax;right:-12vmax}
+.orbs i:nth-child(2){width:52vmax;height:52vmax;background:var(--orb-b);bottom:-26vmax;left:-16vmax}
+
+.page{position:relative;z-index:1;flex:1 0 auto;width:100%;max-width:1100px;margin:0 auto;padding:24px 24px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+body{display:flex;flex-direction:column}
+.top{position:fixed;top:calc(env(safe-area-inset-top,0px) + 22px);left:28px;right:28px;width:auto;z-index:2}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;
+  border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  font-size:13px;font-weight:500;color:var(--ink-soft);white-space:nowrap}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--hot-1),var(--hot-2))}
+
+.card{width:100%;max-width:750px;border-radius:28px;padding:28px 28px 22px;background:var(--glass);
+  border:1px solid var(--line);backdrop-filter:blur(24px) saturate(140%);-webkit-backdrop-filter:blur(24px) saturate(140%);
+  box-shadow:var(--shadow)}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+.month{font-weight:800;font-stretch:118%;font-variation-settings:"wdth" 118;font-size:clamp(36px,5vw,52px);
+  line-height:.88;letter-spacing:-.035em;margin:0}
+.year{font-weight:300;font-size:clamp(16px,2vw,20px);color:var(--ink-soft);letter-spacing:-.01em;margin-left:.15em}
+.nav{display:flex;gap:8px;flex-shrink:0}
+.nav button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--glass);
+  color:var(--ink);cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.nav button:hover{background:var(--cell-hover)}
+.nav svg{width:15px;height:15px}
+
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.head,.grid{max-width:504px;margin-left:auto;margin-right:auto}
+.wd{font-size:12px;font-weight:500;color:var(--ink-faint);text-align:center;padding:2px 0 8px;line-height:1.25}
+.day{position:relative;height:58px;border-radius:14px;border:1px solid transparent;
+  background:transparent;color:var(--ink);font:inherit;cursor:pointer;padding:0;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:background .15s,border-color .15s,transform .15s}
+.day:hover{background:var(--cell-hover);border-color:var(--line)}
+.day:focus-visible,.nav button:focus-visible,.btn:focus-visible,.close:focus-visible{outline:2px solid var(--hot-1);outline-offset:2px}
+.day .n{font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
+.day.out{visibility:hidden;pointer-events:none}
+.day.today::after{content:"";position:absolute;inset:3px;border-radius:11px;border:1.5px solid var(--ink-soft);pointer-events:none}
+.day .meta{display:flex;align-items:center;justify-content:center;gap:3px;height:12px;max-width:100%;padding:0 3px}
+.day .fmt{font-size:10px;font-weight:600;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day .fmt-s{display:none}
+.day .sd{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%}
+
+.day.feed{background:linear-gradient(145deg,var(--hot-1),var(--hot-2));color:var(--on-hot);
+  box-shadow:0 10px 20px -12px rgba(255,77,46,.65)}
+.day.feed:hover{transform:translateY(-2px);background:linear-gradient(145deg,var(--hot-1),var(--hot-2));border-color:transparent}
+.day.feed .sd{box-shadow:0 0 0 1px rgba(255,255,255,.6)}
+.day.feed.today::after{border-color:rgba(255,255,255,.9)}
+.day.story{border-color:rgba(255,122,31,.55);background:var(--glass)}
+.day.draft{background:var(--draft);border-color:transparent;cursor:pointer}
+.day.draft:hover{background:var(--draft-hover);border-color:transparent}
+.day.draft .fmt,.day.draft .fmt-s{color:var(--ink-soft);font-weight:500}
+.day.draft .sd{display:none}
+.day.story .fmt{color:var(--ink-soft);font-weight:500}
+
+.day.locked{color:var(--ink-faint)}
+.day.locked:hover{background:var(--cell-hover)}
+.day .evs{position:absolute;left:14px;right:14px;bottom:5px;height:3px;display:flex;gap:3px}
+.day .evs i{flex:1;border-radius:2px;opacity:.9}
+.ev-mont{background:var(--ev-mont)}.ev-grav{background:var(--ev-grav)}.ev-final{background:var(--ev-final)}
+.day.feed .evs i{box-shadow:0 0 0 1px rgba(255,255,255,.55)}
+.legend .bar{width:12px;height:3px;border-radius:2px}
+.nav button:disabled{opacity:.3;cursor:default}
+.nav button:disabled:hover{background:var(--glass)}
+.day .lock{width:11px;height:11px;opacity:.75}
+.mini{position:fixed;z-index:21;left:50%;top:50%;width:min(360px,calc(100% - 32px));transform:translate(-50%,-46%) scale(.98);opacity:0;pointer-events:none;
+  transition:transform .22s ease,opacity .2s;background:var(--glass-strong);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);padding:26px 24px 20px;text-align:center}
+.mini.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+.mini .ic{width:44px;height:44px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;border:1px solid var(--line);color:var(--ink-soft)}
+.mini .ic svg{width:18px;height:18px}
+.mini h2{margin:0 0 6px;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.mini p{margin:0 0 18px;font-size:14px;line-height:1.5;color:var(--ink-soft)}
+.legend{display:flex;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;scrollbar-width:none;justify-content:safe center;gap:7px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:10.5px;color:var(--ink-soft)}
+.legend::-webkit-scrollbar{display:none}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend .sw{width:11px;height:11px;border-radius:4px}
+.legend .sw.feed{background:linear-gradient(145deg,var(--hot-1),var(--hot-2))}
+.legend .sw.story{border:1.5px solid var(--hot-1)}
+.legend .sw.draft{background:var(--ink-faint);opacity:.45}
+.legend .sd{width:6px;height:6px;border-radius:50%}
+.legend .gap{width:1px;height:12px;background:var(--line);align-self:center}
+.note{font-size:12px;color:var(--ink-faint);text-align:center;max-width:52ch;line-height:1.5;margin:0}
+
+/* Modal */
+.scrim{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;z-index:21;left:50%;top:50%;width:min(620px,calc(100% - 32px));max-height:calc(100% - 48px);
+  transform:translate(-50%,-46%) scale(.98);opacity:0;pointer-events:none;transition:transform .22s ease,opacity .2s;
+  background:var(--glass-strong);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);display:flex;flex-direction:column;overflow:hidden}
+.sheet.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+.sh-head{padding:24px 26px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid var(--line)}
+.sh-date{font-weight:800;font-variation-settings:"wdth" 115;font-size:30px;letter-spacing:-.025em;line-height:1;margin:0}
+.sh-sub{margin:8px 0 0;font-size:14px;color:var(--ink-soft)}
+.close{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center;flex-shrink:0}
+.close svg{width:16px;height:16px}
+.sh-body{padding:20px 26px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:14px 14px}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f.full{grid-column:1/-1}
+.f label{font-size:13px;font-weight:600;color:var(--ink-soft)}
+.f input,.f select,.f textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--field);border:1px solid var(--line);
+  border-radius:12px;padding:11px 13px;width:100%;resize:vertical}
+.f textarea{min-height:84px;line-height:1.5;white-space:pre-wrap}
+.f textarea.tall{min-height:140px}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--hot-1);box-shadow:0 0 0 3px rgba(255,138,31,.2)}
+.f select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-soft) 50%),linear-gradient(135deg,var(--ink-soft) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.f input[readonly],.f select:disabled,.f textarea[readonly]{opacity:.8}
+.toggle{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--field);cursor:pointer}
+.toggle input{position:absolute;opacity:0;width:1px;height:1px}
+.toggle .tg{width:38px;height:22px;border-radius:999px;background:var(--ink-faint);position:relative;flex-shrink:0;transition:background .15s}
+.toggle .tg::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.toggle input:checked+.tg{background:linear-gradient(135deg,var(--hot-1),var(--hot-2))}
+.toggle input:checked+.tg::after{transform:translateX(16px)}
+.toggle input:focus-visible+.tg{outline:2px solid var(--hot-1);outline-offset:2px}
+.toggle b{display:block;font-size:14px;font-weight:600}
+.toggle small{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+.sh-foot{padding:16px 26px 22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.msg{font-size:13px;color:var(--ink-soft)}
+.btns{display:flex;gap:10px}
+.btn{font:inherit;font-size:15px;font-weight:600;border-radius:999px;padding:11px 20px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.btn.primary{border:0;color:var(--on-hot);background:linear-gradient(135deg,var(--hot-1),var(--hot-2))}
+.btn.primary:disabled{opacity:.5;cursor:default}
+.btn.ghost{color:var(--ink-soft)}
+
+@media (max-width:640px){
+  .page{padding:72px 12px 28px;justify-content:flex-start}
+  .top{left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 14px)}
+  .card{padding:20px 14px 18px;border-radius:24px}
+  .head{margin-bottom:18px}
+  .nav button{width:38px;height:38px}
+  .grid{gap:4px}
+  .day{border-radius:11px;height:48px}
+  .day .fmt{display:none}
+  .day .fmt-s{display:inline;font-size:9.5px;font-weight:600}
+  .day .meta{gap:3px;padding:0 2px}
+  .wd{font-size:11px}
+  .legend{justify-content:flex-start}
+  .pill{font-size:12px;padding:6px 11px}
+  .sheet{left:0;right:0;top:auto;bottom:0;width:100%;max-height:92%;transform:translateY(24px);border-radius:24px 24px 0 0;
+    padding-bottom:env(safe-area-inset-bottom,0px)}
+  .sheet.open{transform:translateY(0)}
+  .sh-body{grid-template-columns:1fr;padding:18px}
+  .sh-head,.sh-foot{padding-left:18px;padding-right:18px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.toggle input:disabled+.tg{opacity:1}
+.sheet .toggle{cursor:default}
+</style>
+</head>
+<body>
+<div class="orbs" aria-hidden="true"><i></i><i></i></div>
+
+<main class="page">
+  <div class="top">
+    <span class="pill"><span class="dot"></span>The Best Speaker</span>
+    <span class="pill" id="count">Carregando…</span>
+  </div>
+
+  <section class="card" aria-label="Calendário de conteúdo">
+    <div class="head">
+      <h1 class="month"><span id="mName">Outubro</span><span class="year" id="mYear">2026</span></h1>
+      <div class="nav">
+        <button id="prev" aria-label="Mês anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button id="next" aria-label="Próximo mês"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </div>
+    <div class="grid" id="grid" role="grid"></div>
+    <div class="legend">
+      <span><i class="sw feed"></i>Feed</span>
+      <span><i class="sw story"></i>Stories</span>
+      <span><i class="sw draft"></i>Em revisão</span>
+      <span class="gap"></span>
+      <span><i class="sd" style="background:var(--st-0)"></i>A produzir</span>
+      <span><i class="sd" style="background:var(--st-1)"></i>Em produção</span>
+      <span><i class="sd" style="background:var(--st-2)"></i>Pronto</span>
+      <span><i class="sd" style="background:var(--st-3)"></i>Publicado</span>
+      <span class="gap"></span>
+      <span><i class="bar ev-mont"></i>Montagem</span>
+      <span><i class="bar ev-grav"></i>Gravações</span>
+      <span><i class="bar ev-final"></i>Final</span>
+    </div>
+  </section>
+  <p class="note" id="note">Em laranja, os posts já revisados e aprovados. Clique em um dia para ver os detalhes.</p>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shDate">
+  <div class="sh-head">
+    <div>
+      <p class="sh-date" id="shDate">—</p>
+      <p class="sh-sub" id="shSub"></p>
+    </div>
+    <button class="close" id="close" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="sh-body">
+    <label class="toggle full" for="fAprovado"><input type="checkbox" id="fAprovado"><span class="tg"></span><span><b>Aprovado</b><small>Revisado e liberado para produção</small></span></label>
+    <div class="f full"><label for="fCapa">Título de capa</label><input id="fCapa" placeholder="O texto que aparece na capa do reel"></div>
+    <div class="f"><label for="fFormato">Formato</label>
+      <select id="fFormato"><option>Reel</option><option>Carrossel</option><option>Foto</option><option>Stories</option></select></div>
+    <div class="f"><label for="fStatus">Status</label>
+      <select id="fStatus"><option>A produzir</option><option>Em produção</option><option>Pronto</option><option>Publicado</option></select></div>
+    <div class="f full"><label for="fTitulo">Pauta</label><textarea id="fTitulo" placeholder="Sobre o que é o post"></textarea></div>
+    <div class="f full"><label for="fBriefing">Briefing</label><textarea id="fBriefing" placeholder="Objetivo, referências, tom, o que precisa aparecer"></textarea></div>
+    <div class="f full"><label for="fRoteiro">Roteiro / copy</label><textarea id="fRoteiro" class="tall" placeholder="Roteiro do vídeo, falas, legenda"></textarea></div>
+    <div class="f"><label for="fDepende">Depende de</label><input id="fDepende" placeholder="Captação ou aprovação"></div>
+    <div class="f"><label for="fResp">Responsável</label><input id="fResp" placeholder="Quem produz"></div>
+  </div>
+  <div class="sh-foot">
+    <span class="msg" id="msg"></span>
+    <div class="btns">
+      <button class="btn ghost" id="del">Remover post</button>
+      <button class="btn primary" id="save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mini" id="mini" role="dialog" aria-modal="true" aria-labelledby="miniT">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+  <h2 id="miniT">Em desenvolvimento</h2>
+  <p id="miniP">Os conteúdos deste período ainda estão sendo planejados.</p>
+  <button class="btn primary" id="miniOk">Entendi</button>
+</div>
+
+<script>
+(function(){
+  const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const WD=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  const WDL=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+  const ST={'A produzir':'var(--st-0)','Em produção':'var(--st-1)','Pronto':'var(--st-2)','Publicado':'var(--st-3)'};
+  const FIELDS=[['capa','fCapa'],['formato','fFormato'],['status','fStatus'],['titulo','fTitulo'],['briefing','fBriefing'],
+    ['roteiro','fRoteiro'],['depende','fDepende'],['responsavel','fResp']];
+  const $=id=>document.getElementById(id);
+
+  let posts={};          // date -> data
+  let db=null, canWrite=true, ready=false;
+  const now=new Date();
+  let view={y:2026,m:9};  // outubro
+  if(now.getFullYear()===2026 && now.getMonth()>=9 && now.getMonth()<=11) view={y:2026,m:now.getMonth()};
+  let current=null;       // date being edited
+
+  const LOCKED=[['2026-11-09','2026-11-12'],['2026-11-15','2026-11-30'],['2026-12-01','2026-12-31']];
+  const EVENTS=[{a:'2026-11-13',b:'2026-11-14',c:'ev-mont',n:'montagem do espaço'},{a:'2026-11-14',b:'2026-11-18',c:'ev-grav',n:'gravações do reality'},{a:'2026-11-21',b:'2026-11-21',c:'ev-final',n:'final do reality'}];
+  const MINV=2026*12+9, MAXV=2026*12+11;
+  function addEv(b,k){ const ev=EVENTS.filter(e=>k>=e.a&&k<=e.b); if(!ev.length) return '';
+    const w=document.createElement('span'); w.className='evs'; ev.forEach(e=>{const i=document.createElement('i'); i.className=e.c; w.appendChild(i)}); b.appendChild(w);
+    return ' ('+ev.map(e=>e.n).join(', ')+')'; }
+  const isLocked=k=>LOCKED.some(([a,b])=>k>=a&&k<=b);
+  const pad=n=>String(n).padStart(2,'0');
+  const key=(y,m,d)=>y+'-'+pad(m+1)+'-'+pad(d);
+  const todayKey=key(now.getFullYear(),now.getMonth(),now.getDate());
+
+  function render(){
+    $('mName').textContent=MONTHS[view.m];
+    $('prev').disabled=view.y*12+view.m<=MINV; $('next').disabled=view.y*12+view.m>=MAXV;
+    $('mYear').textContent=view.y;
+    const g=$('grid'); g.textContent='';
+    WD.forEach(w=>{const e=document.createElement('div');e.className='wd';e.textContent=w;g.appendChild(e)});
+    const first=new Date(view.y,view.m,1);
+    const lead=(first.getDay()+6)%7;
+    const days=new Date(view.y,view.m+1,0).getDate();
+    for(let i=0;i<lead;i++){const e=document.createElement('div');e.className='day out';g.appendChild(e)}
+    let feedCount=0;
+    for(let d=1;d<=days;d++){
+      const k=key(view.y,view.m,d), p=posts[k];
+      const b=document.createElement('button'); b.className='day'; b.type='button';
+      if(k===todayKey) b.classList.add('today');
+      const n=document.createElement('span'); n.className='n'; n.textContent=d; b.appendChild(n);
+      let label=WDL[new Date(view.y,view.m,d).getDay()]+', '+d+' de '+MONTHS[view.m].toLowerCase();
+      if(isLocked(k)){
+        b.classList.add('locked');
+        const meta=document.createElement('span'); meta.className='meta'; meta.innerHTML='<svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'; b.appendChild(meta);
+        b.setAttribute('aria-label',label+addEv(b,k)+': em desenvolvimento');
+        b.addEventListener('click',openMini); g.appendChild(b); continue;
+      }
+      if(p){
+        const isFeed=p.formato && p.formato!=='Stories';
+        if(p.aprovado===true){ b.classList.add(isFeed?'feed':'story'); if(isFeed) feedCount++; }
+        else b.classList.add('draft');
+        const meta=document.createElement('span'); meta.className='meta';
+        const sd=document.createElement('i'); sd.className='sd'; sd.style.background=ST[p.status]||ST['A produzir'];
+        const f=document.createElement('span'); f.className='fmt'; f.textContent=p.formato||'';
+        const fs=document.createElement('span'); fs.className='fmt-s'; fs.textContent=({Carrossel:'Carr.',Stories:'Story'})[p.formato]||p.formato||'';
+        meta.appendChild(sd); meta.appendChild(f); meta.appendChild(fs); b.appendChild(meta);
+        label+=': '+(p.formato||'')+(p.aprovado===true?', aprovado, '+(p.status||'A produzir'):', em revisão')+'. '+(p.capa||p.titulo||'');
+      } else label+=': sem post';
+      b.setAttribute('aria-label',label+addEv(b,k));
+      b.addEventListener('click',()=>openSheet(k));
+      g.appendChild(b);
+    }
+    $('count').textContent=ready ? (feedCount+(feedCount===1?' post aprovado':' posts aprovados')+' no feed em '+MONTHS[view.m].toLowerCase()) : 'Carregando…';
+  }
+
+  function fmtDate(k){
+    const [y,m,d]=k.split('-').map(Number); const dt=new Date(y,m-1,d);
+    return {big:d+' de '+MONTHS[m-1].toLowerCase(), wd:WDL[dt.getDay()]};
+  }
+
+  function openSheet(k){
+    current=k; const p=posts[k]; const fd=fmtDate(k);
+    $('shDate').textContent=fd.big.charAt(0).toUpperCase()+fd.big.slice(1);
+    const isFeedP=p&&p.formato&&p.formato!=='Stories';
+    $('shSub').textContent=fd.wd.charAt(0).toUpperCase()+fd.wd.slice(1)+(p&&p.fase?(' — Fase '+p.fase+(p.semana?', semana '+p.semana:'')):(p?'':' — dia sem post'))+(isFeedP?'. Repost nos stories no mesmo dia.':'');
+    FIELDS.forEach(([f,id])=>{const el=$(id); el.value=(p&&p[f])||(f==='formato'?'Reel':f==='status'?'A produzir':'');
+      if(el.tagName==='SELECT') el.disabled=!canWrite; else el.readOnly=!canWrite;});
+    $('fAprovado').checked=!!(p&&p.aprovado===true); $('fAprovado').disabled=true;
+    $('del').style.display=(p&&canWrite)?'':'none';
+    $('save').style.display=canWrite?'':'none';
+    $('save').textContent=p?'Salvar':'Criar post';
+    $('save').disabled=false;
+    $('msg').textContent='';
+    $('scrim').classList.add('open'); $('sheet').classList.add('open');
+    requestAnimationFrame(()=>document.querySelectorAll('.sheet textarea').forEach(fit));
+    setTimeout(()=>$('fCapa').focus({preventScroll:true}),60);
+  }
+  let miniOpen=false;
+  function openMini(){ miniOpen=true; $('scrim').classList.add('open'); $('mini').classList.add('open'); setTimeout(()=>$('miniOk').focus(),60); }
+  function closeMini(){ miniOpen=false; $('mini').classList.remove('open'); if(!current) $('scrim').classList.remove('open'); }
+  function closeSheet(){ $('scrim').classList.remove('open'); $('sheet').classList.remove('open'); current=null; }
+
+  async function save(){
+    if(!db||!current) return;
+    const k=current; const base=posts[k]||{date:k};
+    const data=Object.assign({},base);
+    FIELDS.forEach(([f,id])=>data[f]=$(id).value.trim());
+    data.aprovado=$('fAprovado').checked;
+    data.date=k; data.updatedAt=new Date().toISOString();
+    $('save').disabled=true; $('msg').textContent='Salvando…';
+    try{
+      await db.collection('posts').doc(k).set(data);
+      posts[k]=data; render();
+      $('msg').textContent='Salvo'; $('save').textContent='Salvar';
+      $('del').style.display='';
+    }catch(e){
+      if(e&&e.code==='invalid_argument'){canWrite=false;$('msg').textContent='Você só tem acesso de leitura.'}
+      else $('msg').textContent='Não foi possível salvar. Tente de novo.';
+    }finally{$('save').disabled=false}
+  }
+  async function remove(){
+    if(!db||!current||!posts[current]) return;
+    if(!confirm('Remover o post deste dia?')) return;
+    try{ await db.collection('posts').doc(current).delete(); delete posts[current]; render(); closeSheet(); }
+    catch(e){ $('msg').textContent='Não foi possível remover.'; }
+  }
+
+  function fit(t){t.style.height='auto';t.style.height=Math.min(Math.max(t.scrollHeight+2,84),520)+'px'}
+  document.querySelectorAll('.sheet textarea').forEach(t=>t.addEventListener('input',()=>fit(t)));
+  $('prev').onclick=()=>{ if(view.y*12+view.m<=MINV) return; view.m--; if(view.m<0){view.m=11;view.y--} render()};
+  $('next').onclick=()=>{ if(view.y*12+view.m>=MAXV) return; view.m++; if(view.m>11){view.m=0;view.y++} render()};
+  $('close').onclick=closeSheet; $('scrim').onclick=()=>{ if(miniOpen) closeMini(); else closeSheet(); }; $('miniOk').onclick=closeMini;
+  $('save').onclick=save; $('del').onclick=remove;
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ if(miniOpen) closeMini(); else if(current) closeSheet(); }
+    if(!current&&!miniOpen&&!e.target.closest('input,textarea,select')){
+      if(e.key==='ArrowLeft') $('prev').click();
+      if(e.key==='ArrowRight') $('next').click();
+    }
+  });
+
+  render();
+
+  const SNAPSHOT={"2026-10-07": {"aprovado": true, "briefing": "Corte gerado no Opus Clip a partir dos 3 documentários de bastidor (30 s a 1min30).\nCuradoria: priorizar momentos com o apresentador, os jurados, o palco e emoção real. Evitar trechos institucionais e figuras da empresa em primeiro plano.\nEdição: legenda, identidade visual da temporada e frase de contexto na tela nos 3 primeiros segundos.", "capa": "Bastidores da Temporada #1", "date": "2026-10-07", "depende": "Biblioteca de cortes no Opus Clip", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "Definido pelo corte do Opus Clip.\nFrase de abertura sugerida na tela: \"O que acontece antes das câmeras ligarem\".", "semana": "1", "status": "A produzir", "stories": "", "titulo": "Corte de documentário: Bastidores da Temporada #1"}, "2026-10-08": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-08", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "1", "status": "A produzir", "stories": "", "titulo": "Caixa de perguntas \"O que você espera da nova temporada?\" (complementa o corte de 07/10)"}, "2026-10-09": {"aprovado": true, "briefing": "Primeira peça da nova fase: virar a chave do The Best Speaker de produto educacional para produto de entretenimento.\nTom cinematográfico, como chamada de estreia de TV. Locução do Otaviano do início ao fim.\nO Otaviano grava de casa (locução e o take em quadro). A equipe monta com o material daqui.\nMaterial: imagens das edições passadas, cortes dos documentários e imagens do novo espaço sem identificação (os 3Ds ficam guardados para a semana da montagem).\nNão mostrar datas nem participantes. Duração: 35 a 45 s. Trilha crescente.\nPublicar em collab com o perfil do Otaviano.", "capa": "Agora é outro jogo", "date": "2026-10-09", "depende": "Locução gravada pelo apresentador", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Tela preta. Som de microfone sendo ligado.\nTexto na tela: \"Você já viu um palco mudar uma vida?\"\n\n[3–12 s] Imagens rápidas das edições passadas: plateia, palco, lágrimas, aplausos.\nOtaviano (off): \"Por anos, o The Best Speaker revelou vozes que o Brasil precisava ouvir.\"\n\n[12–22 s] Detalhes do novo espaço, sem identificação.\nOtaviano (off): \"Agora a gente decidiu ir além. Um novo estúdio. Novos desafios. Jurados que o Brasil inteiro conhece.\"\n\n[22–32 s] Silhuetas na mesa dos jurados, sem revelar quem são.\nOtaviano (off): \"Vai ter emoção, vai ter competição, vai ter história. E vai ter muita gente torcendo.\"\n\n[32–40 s] Otaviano em quadro, gravado em casa, olhando para a câmera:\n\"Eu sou Otaviano Costa e vou te levar para dentro do único reality de palestrantes do Brasil.\"\n\n[40–45 s] Logo da temporada. Texto: \"Nova temporada. Em breve.\"\n\nLegenda sugerida: \"O The Best Speaker mudou de tamanho. Ativa as notificações: a partir de hoje a gente conta tudo o que acontece até a nova temporada.\"", "semana": "1", "status": "A produzir", "stories": "", "titulo": "Reel-manifesto com locução do apresentador: \"O The Best Speaker agora é entretenimento\""}, "2026-10-10": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-10", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "1", "status": "A produzir", "stories": "", "titulo": "Bastidor da gravação da locução do Otaviano (complementa o manifesto de 09/10)"}, "2026-10-11": {"aprovado": true, "briefing": "Reel de transição: homenageia a última temporada na Catedral e apresenta que existe um novo lugar, sem dizer onde.\nPrimeira metade: imagens da Catedral com locução do Otaviano.\nSegunda metade: imagens do novo espaço sem nada que o identifique (sem fachada, placa, logo ou acessos). Detalhes, texturas, espaço vazio em contraluz, porta se abrindo.\nO final fica em aberto de propósito: o espaço aparece com mais calma no reel de 14/10, ainda sem revelar o nome do lugar.\nDuração: 30 a 40 s. Trilha que começa emotiva e vira expectativa. Collab com o perfil do Otaviano.", "capa": "Da Catedral a um novo palco", "date": "2026-10-11", "depende": "Imagens da Catedral + imagens do novo espaço sem identificação + locução do Otaviano", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Plano aberto da Catedral iluminada.\nTexto na tela: \"Foi aqui que tudo aconteceu.\"\n\n[3–15 s] Momentos da última temporada na Catedral: palco, plateia, emoção, aplausos.\nOtaviano (off): \"A última temporada do The Best Speaker aconteceu num lugar lindo. A Catedral viu histórias que a gente nunca vai esquecer.\"\n\n[15–20 s] Última imagem da Catedral escurecendo devagar.\nOtaviano (off): \"Mas o programa cresceu. E pediu um palco novo.\"\n\n[20–30 s] Imagens do novo espaço sem identificação: porta se abrindo, espaço vazio em contraluz, detalhes, passos ecoando.\nOtaviano (off): \"Um espaço pensado como os grandes realities que você já viu na TV.\"\n\n[30–37 s] Tela escura.\nOtaviano (off): \"Onde? Isso eu te conto em breve.\"\nTexto na tela: \"Nova temporada. Novo palco.\"\n\nLegenda sugerida: \"A Catedral foi só o começo. Onde você acha que vai ser o novo palco do The Best Speaker? Chuta nos comentários.\"", "semana": "1", "status": "A produzir", "stories": "", "titulo": "Reel \"Da Catedral a um novo palco\": última temporada + novo espaço sem revelar onde"}, "2026-10-12": {"aprovado": true, "briefing": "Corte gerado no Opus Clip a partir dos 3 documentários de bastidor (30 s a 1min30).\nCuradoria: momento de tensão, emoção ou humor que funcione sozinho, sem precisar de contexto. Não usar trechos que mostrem o novo espaço.\nEdição: legenda, identidade visual da temporada e frase de contexto na tela nos 3 primeiros segundos.", "capa": "Bastidores da Temporada #2", "date": "2026-10-12", "depende": "Biblioteca de cortes no Opus Clip", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "Definido pelo corte do Opus Clip.\nFrase de abertura sugerida na tela: \"Ninguém viu essa parte\".", "semana": "2", "status": "A produzir", "stories": "", "titulo": "Corte de documentário: Bastidores da Temporada #2"}, "2026-10-13": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-13", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "2", "status": "A produzir", "stories": "", "titulo": "Caixa de perguntas \"Onde você acha que vai ser o novo palco?\" (complementa o reel da Catedral de 11/10) + teaser \"amanhã você entra no novo espaço\""}, "2026-10-14": {"aprovado": true, "briefing": "Mini-documentário do novo espaço, com o que já temos gravado. Responde em parte ao mistério do reel de 11/10: mostra o lugar, mas ainda sem dizer onde é.\nCenas disponíveis: visita técnica, closes do espaço vazio e a equipe com o desenho técnico/planta baixa na mão.\nNão citar o nome do local nem mostrar fachada, placa ou acessos. Os 3Ds ficam guardados para mais perto da montagem.\nA locução do Otaviano conduz o vídeo. Se houver áudio da equipe na visita técnica, entra uma frase curta.\nDuração: 45 a 60 s. Collab com o perfil do Otaviano.\nGuardar o material bruto: ele volta no reel da montagem (13/11) para o antes e depois.", "capa": "Onde nasce a nova temporada", "date": "2026-10-14", "depende": "Imagens da visita técnica + closes do espaço + takes da equipe com a planta baixa + locução do Otaviano", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–5 s] Porta se abrindo, o mesmo plano que fechou o reel de 11/10.\nOtaviano (off): \"Prometi que ia te mostrar. Então vem comigo.\"\n\n[5–15 s] Travelling pelo espaço vazio (visita técnica).\nOtaviano (off): \"Por enquanto, é só um espaço vazio. Mas é aqui que vai nascer a nova temporada do The Best Speaker.\"\n\n[15–30 s] Equipe com a planta baixa na mão, apontando para o espaço.\nOtaviano (off): \"Cada metro já tem destino: onde fica o palco, onde senta quem vai julgar, onde a plateia vai prender a respiração.\"\n\n[30–45 s] Closes do espaço: luz entrando, texturas, detalhes.\nOtaviano (off): \"Tem um time inteiro trabalhando para transformar este lugar num estúdio de reality.\"\n(Se houver áudio da visita técnica, inserir aqui uma frase curta da equipe.)\n\n[45–55 s] Otaviano (off): \"Ano passado foi a Catedral. Este ano, a gente vai construir o nosso próprio palco. E você vai acompanhar cada passo.\"\nTexto na tela: \"Nova temporada. Novo palco.\" Logo.\n\nLegenda sugerida: \"Ainda vazio, mas não por muito tempo. Daqui a algumas semanas, este espaço vira um estúdio.\"", "semana": "2", "status": "A produzir", "stories": "", "titulo": "Reel do novo espaço: visita técnica, closes e equipe com a planta, sem revelar o local"}, "2026-10-15": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-15", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "2", "status": "A produzir", "stories": "", "titulo": "Bastidor da visita técnica (complementa o reel do novo espaço de 14/10) + respostas da caixa \"Onde você acha que vai ser o novo palco?\""}, "2026-10-16": {"aprovado": true, "briefing": "Corte gerado no Opus Clip a partir dos 3 documentários de bastidor (30 s a 1min30).\nCuradoria: de preferência um trecho com o apresentador, para manter o Otaviano como voz da temporada. Não usar trechos que mostrem o novo espaço.\nEdição: legenda, identidade visual da temporada e frase de contexto na tela nos 3 primeiros segundos.", "capa": "Bastidores da Temporada #3", "date": "2026-10-16", "depende": "Biblioteca de cortes no Opus Clip", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "Definido pelo corte do Opus Clip.\nFrase de abertura sugerida na tela: \"Antes de tudo começar\".", "semana": "2", "status": "A produzir", "stories": "", "titulo": "Corte de documentário: Bastidores da Temporada #3"}, "2026-10-17": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-17", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "2", "status": "A produzir", "stories": "", "titulo": "Caixa de perguntas \"O que você imagina neste espaço?\" + teaser \"domingo: a escola do reality\""}, "2026-10-18": {"aprovado": true, "briefing": "Apresentar a The Best School como a casa de ensino do reality: onde os participantes aprendem antes de enfrentar o palco.\nO Otaviano grava de casa, falando direto para a câmera e respondendo de forma natural, como uma conversa. Sem formato de entrevista e sem perguntas na tela.\nA equipe intercala as falas com imagens do espaço captadas aqui e com um take do Márcio falando do projeto The Best School e da evolução da aprendizagem.\nComo a escola funciona em detalhe (duração, aulas, dinâmica) ainda será definido: falar só do conceito.\nDuração: 45 a 60 s. Collab com o perfil do Otaviano.\n\nO que a fala do Otaviano precisa cobrir:\n1. O que é a The Best School dentro do reality.\n2. Por que ela existe.\n3. O que muda em quem passa por ela.", "capa": "Antes do palco, a escola", "date": "2026-10-18", "depende": "Gravação do Otaviano + take do Márcio", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Imagem do espaço captada aqui.\nTexto na tela: \"Ninguém chega pronto no palco.\"\n\n[3–20 s] Otaviano em quadro, gravado em casa, falando natural (sugestão, ele adapta):\n\"Sabe o que pouca gente sabe sobre o The Best Speaker? Antes de subir no palco, os participantes passam por uma escola. A The Best School. É ali que eles aprendem, erram, ajustam… pra chegar no palco prontos pro que vier.\"\n\n[20–35 s] Take do Márcio: o projeto The Best School e como a aprendizagem evoluiu de uma temporada para a outra. [Fala dele]\n\n[35–50 s] Otaviano em quadro, gravado em casa, intercalado com imagens do espaço:\n\"Então não é só competição. É gente se transformando na frente de todo mundo. Uma casa pra aprender, um palco pra provar.\"\n\n[50–55 s] Texto na tela: \"The Best School. A casa de ensino do reality.\" Logo.\n\nLegenda sugerida: \"Todo grande palestrante teve alguém que ensinou o caminho. No reality, esse lugar tem nome: The Best School.\"", "semana": "2", "status": "A produzir", "stories": "", "titulo": "The Best School: a casa de ensino do reality, com Otaviano e take do Márcio"}, "2026-10-19": {"aprovado": true, "briefing": "Corte gerado no Opus Clip a partir dos 3 documentários de bastidor (30 s a 1min30).\nCuradoria: momento de tensão, emoção ou humor que funcione sozinho, sem precisar de contexto.\nEdição: legenda, identidade visual da temporada e frase de contexto na tela nos 3 primeiros segundos.", "capa": "Bastidores da Temporada #4", "date": "2026-10-19", "depende": "Biblioteca de cortes no Opus Clip", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "Definido pelo corte do Opus Clip.\nFrase de abertura sugerida na tela: \"Do jeito que aconteceu\".", "semana": "3", "status": "A produzir", "stories": "", "titulo": "Corte de documentário: Bastidores da Temporada #4"}, "2026-10-20": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-20", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "3", "status": "A produzir", "stories": "", "titulo": "Caixa de perguntas \"O que você queria aprender antes de subir num palco?\" (complementa a The Best School de 18/10)"}, "2026-10-21": {"aprovado": true, "briefing": "Primeira apresentação da série Mesa dos Jurados. Gabriela Prioli é uma referência em argumentação e comunicação, então o ângulo é: o que ela vai cobrar de quem subir no palco.\nGravação dela (selfie ou com equipe), abertura com locução do Otaviano. Publicar em collab com o perfil dela.\nAs falas abaixo são sugestões: enviar as perguntas e deixar que ela responda com as próprias palavras.\nDuração: 30 a 45 s. [Confirmar o papel dela: jurada, mentora ou ambos]\n\nPerguntas para enviar:\n1. Por que você topou fazer parte do The Best Speaker?\n2. O que você vai olhar em cada palestrante?\n3. Qual erro derruba uma fala na hora?\n4. Um recado para quem vai subir no palco.", "capa": "Gabriela Prioli está na mesa", "date": "2026-10-21", "depende": "Gravação e aprovação da jurada", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Close na Gabriela, ainda sem falar.\nTexto na tela: \"Ela vai estar na mesa dos jurados.\"\n\n[3–7 s] Otaviano (off): \"Na mesa desta temporada do The Best Speaker: Gabriela Prioli.\"\n\n[7–30 s] Gabriela responde às perguntas 2 e 3.\nSugestão de fala: \"Não basta falar bonito. Eu quero ver argumento, quero ver alguém que sustenta o que diz.\"\n\n[30–40 s] Resposta à pergunta 4, olhando para a câmera.\nSugestão de fala: \"Se você vai subir nesse palco, vem preparado.\"\n\n[40–45 s] Texto: \"Mesa dos Jurados. Nova temporada do The Best Speaker.\"\n\nLegenda sugerida: \"Ela está na mesa. Você teria coragem de subir no palco sabendo que a Gabriela está ali?\"", "semana": "3", "status": "A produzir", "stories": "", "titulo": "Mesa dos Jurados #1: Gabriela Prioli (collab)"}, "2026-10-22": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-22", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "3", "status": "A produzir", "stories": "", "titulo": "Recado da Gabriela Prioli (complementa a Mesa dos Jurados de 21/10) + respostas da caixa sobre a The Best School"}, "2026-10-23": {"aprovado": true, "briefing": "Segunda apresentação da série Mesa dos Jurados. Leandro Karnal é historiador e um dos palestrantes mais conhecidos do país, então o ângulo é: o que, para ele, transforma uma fala em uma grande fala.\nMesmo formato da Mesa dos Jurados #1, para criar série. Publicar em collab com o perfil dele.\nFalas sugeridas: ele responde com as próprias palavras.\nDuração: 30 a 45 s. [Confirmar o papel dele: jurado, mentor ou ambos]\n\nPerguntas para enviar:\n1. Por que você topou fazer parte do The Best Speaker?\n2. O que transforma uma fala em uma grande fala?\n3. Uma fala que você nunca esqueceu: por quê?\n4. Um recado para quem vai subir no palco.", "capa": "Leandro Karnal na mesa", "date": "2026-10-23", "depende": "Gravação e aprovação do jurado", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Close no Karnal.\nTexto na tela: \"Mais um nome da mesa.\"\n\n[3–7 s] Otaviano (off): \"Ele já subiu em milhares de palcos. Agora, vai avaliar quem quer subir. Leandro Karnal.\"\n\n[7–30 s] Karnal responde às perguntas 2 e 3.\n\n[30–40 s] Resposta à pergunta 4, olhando para a câmera.\n\n[40–45 s] Texto: \"Mesa dos Jurados. Nova temporada do The Best Speaker.\"\n\nLegenda sugerida: \"Karnal está na mesa. O que você perguntaria a ele antes de subir no palco?\"", "semana": "3", "status": "A produzir", "stories": "", "titulo": "Mesa dos Jurados #2: Leandro Karnal (collab)"}, "2026-10-24": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-24", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "3", "status": "A produzir", "stories": "", "titulo": "Recado do Leandro Karnal (complementa a Mesa dos Jurados de 23/10)"}, "2026-10-25": {"aprovado": true, "briefing": "Apresentar o time artístico completo num lugar só: apresentador, jurados e mentores. Todos os nomes já foram divulgados, então não há suspense nem silhuetas.\nDestaque para Thiago Athanázio e Betty Agi, campeões do The Best Speaker 2024 e 2025, que voltam agora do outro lado. [Confirmar o papel de cada um: jurado, mentor ou ambos]\nUm card por nome, com foto, papel no reality e uma frase da pessoa.\n8 cards.", "capa": "Quem forma os palestrantes do reality", "date": "2026-10-25", "depende": "Lista de mentores e temas", "fase": "1", "formato": "Carrossel", "responsavel": "", "roteiro": "Card 1 (capa): \"Quem forma os palestrantes do reality\". Mosaico com os 6 rostos.\n\nCard 2: Otaviano Costa — apresentador e mentor. Frase dele sobre a temporada.\n\nCard 3: Gabriela Prioli. Frase da Mesa dos Jurados.\n\nCard 4: Leandro Karnal. Frase da Mesa dos Jurados.\n\nCard 5: Luis Justo. [Frase dele]\n\nCard 6: Thiago Athanázio — campeão do The Best Speaker 2024. [Frase dele]\n\nCard 7: Betty Agi — campeã do The Best Speaker 2025. [Frase dela]\n\nCard 8: \"Dois campeões voltaram para formar os próximos. Qual deles você queria ter como mentor? Comenta.\"\n\nLegenda sugerida: \"Apresentador, jurados e dois campeões que agora estão do outro lado. Esse é o time da nova temporada.\"", "semana": "3", "status": "A produzir", "stories": "", "titulo": "Carrossel \"Quem forma os palestrantes do reality\": time completo, com os campeões de 2024 e 2025"}, "2026-10-26": {"aprovado": true, "briefing": "Apresentação do Luis Justo na série Mesa dos Jurados. Ângulo: o olhar de quem conhece palco de grandes eventos e entretenimento. [Confirmar a descrição de trajetória que ele prefere usar]\nMesmo formato da série. Publicar em collab com o perfil dele.\nDuração: 30 a 45 s. [Confirmar papel: jurado, mentor ou ambos]\n\nPerguntas para enviar:\n1. Por que você topou fazer parte do The Best Speaker?\n2. O que faz alguém prender a atenção de uma plateia?\n3. O que separa um bom palestrante de um grande show?\n4. Um recado para quem vai subir no palco.", "capa": "Luis Justo na mesa", "date": "2026-10-26", "depende": "Gravação e aprovação do jurado", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Close no Luis.\nTexto na tela: \"Ele conhece palco de grandes eventos.\"\n\n[3–7 s] Otaviano (off): \"Na mesa desta temporada do The Best Speaker: Luis Justo.\"\n\n[7–30 s] Luis responde às perguntas 2 e 3.\n\n[30–40 s] Resposta à pergunta 4, olhando para a câmera.\n\n[40–45 s] Texto: \"Mesa dos Jurados. Nova temporada do The Best Speaker.\"\n\nLegenda sugerida: \"Quem já prendeu a atenção de plateias gigantes sabe o que procurar num palestrante. O que você quer ouvir do Luis?\"", "semana": "4", "status": "A produzir", "stories": "", "titulo": "Mesa dos Jurados #3: Luis Justo (collab)"}, "2026-10-27": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-27", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "4", "status": "A produzir", "stories": "", "titulo": "Caixa de perguntas \"Qual mentor você queria ter?\" (complementa o carrossel de 25/10) + recado do Luis Justo (complementa 26/10)"}, "2026-10-28": {"aprovado": true, "briefing": "Corte gerado no Opus Clip a partir dos 3 documentários de bastidor (30 s a 1min30).\nCuradoria: de preferência um trecho com jurados ou com o apresentador, para reforçar o time artístico.\nEdição: legenda, identidade visual da temporada e frase de contexto na tela nos 3 primeiros segundos.", "capa": "Bastidores da Temporada #5", "date": "2026-10-28", "depende": "Biblioteca de cortes no Opus Clip", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "Definido pelo corte do Opus Clip.\nFrase de abertura sugerida na tela: \"Quem estava lá viu\".", "semana": "4", "status": "A produzir", "stories": "", "titulo": "Corte de documentário: Bastidores da Temporada #5"}, "2026-10-29": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-29", "depende": "Respostas gravadas pelo time artístico", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "4", "status": "A produzir", "stories": "", "titulo": "Enquete \"Qual jurado vai ser o mais exigente?\""}, "2026-10-30": {"aprovado": true, "briefing": "Único vídeo da série sobre provas.\nFalar da estratégia e das novidades que vieram do ano passado para este. Não abordar as provas em si: nenhum nome, regra, mecânica ou pista de prova.\nNão repetir o \"todo dia uma eliminação\": essa novidade tem reel próprio em 04/11.\nCopy e roteiro em aberto, a definir com a produção.", "capa": "[A definir]", "date": "2026-10-30", "depende": "Alinhamento com a produção sobre o que pode ser dito", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[Em aberto]", "semana": "4", "status": "A produzir", "stories": "", "titulo": "Série de provas (vídeo único): estratégia e novidades da temporada, sem falar das provas"}, "2026-10-31": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-10-31", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "4", "status": "A produzir", "stories": "", "titulo": "Caixa de perguntas \"O que você espera de novo nesta temporada?\" (complementa o vídeo de provas de 30/10)"}, "2026-11-01": {"aprovado": true, "briefing": "Betty Agi, campeã do The Best Speaker 2025, volta na nova temporada do outro lado. Ângulo: de campeã a mentora. [Confirmar papel: jurada, mentora ou ambos]\nFecha a apresentação do time com todos lado a lado. Publicar em collab com o perfil dela.\nUsar imagens de arquivo da vitória dela em 2025.\nDuração: 30 a 45 s.\n\nPerguntas para enviar:\n1. O que mudou na sua vida depois de vencer o The Best Speaker?\n2. Como é voltar agora do outro lado?\n3. O que você vai observar em cada participante?\n4. Um recado para quem vai subir no palco.", "capa": "De campeã a mentora", "date": "2026-11-01", "depende": "Gravação e aprovação da jurada", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Imagem de arquivo da Betty vencendo em 2025.\nTexto na tela: \"Ano passado, ela venceu.\"\n\n[3–8 s] Otaviano (off): \"Betty Agi, campeã do The Best Speaker 2025, está de volta. Agora do outro lado.\"\n\n[8–30 s] Betty responde às perguntas 1 e 2.\n\n[30–38 s] Resposta à pergunta 4, olhando para a câmera.\n\n[38–45 s] Montagem rápida com todo o time lado a lado.\nOtaviano (off): \"O time está completo. Agora só falta o palco.\"\n\nLegenda sugerida: \"Ano passado ela estava no palco. Este ano, está do outro lado. Qual conselho você pediria para a Betty?\"", "semana": "4", "status": "A produzir", "stories": "", "titulo": "Betty Agi: de campeã a mentora (collab)"}, "2026-11-02": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-11-02", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "5", "status": "A produzir", "stories": "", "titulo": "Recado da Betty Agi + time completo (complementa o reel de 01/11)"}, "2026-11-03": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-11-03", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "5", "status": "A produzir", "stories": "", "titulo": "Quiz \"Você lembra quem venceu?\": campeões de 2024 (Thiago Athanázio) e 2025 (Betty Agi), com fotos de arquivo das vitórias + enquete \"Quem você acha que leva esta temporada: alguém que já é palestrante ou alguém que está começando?\""}, "2026-11-04": {"aprovado": true, "briefing": "Apresentar a grande novidade do formato: prova todos os dias e eliminação todos os dias. Na temporada passada não era assim.\nFalar da dinâmica e da pressão diária, sem descrever nenhuma prova (nome, regra ou mecânica).\nO Otaviano grava de casa (falas em quadro, fundo neutro ou escuro). A equipe intercala com imagens de clima captadas aqui, sem participantes.\nTom de chamada de TV. Duração: 30 a 40 s. Collab com o perfil do Otaviano.", "capa": "Todo dia, uma eliminação", "date": "2026-11-04", "depende": "Gravação do Otaviano + imagens de clima sem participantes", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Tela escura. Texto grande: \"Todo dia.\" Corte seco: \"Uma eliminação.\"\n\n[3–12 s] Otaviano em quadro, gravado em casa:\n\"Na temporada passada, o The Best Speaker não funcionava assim. Este ano, mudou tudo.\"\n\n[12–25 s] Imagens de clima captadas aqui: microfone no pedestal, palco sob luz única, cadeira vazia, porta do estúdio.\nOtaviano (off): \"Todo dia tem prova. E todo dia alguém vai embora. Não dá pra guardar energia pro final: cada fala pode ser a última.\"\n\n[25–33 s] Otaviano em quadro, gravado em casa, olhando para a câmera:\n\"Você aguentaria subir no palco sabendo que hoje alguém sai?\"\n\n[33–38 s] Texto: \"Todo dia, uma eliminação. Nova temporada do The Best Speaker.\" Logo.\n\nLegenda sugerida: \"Ano passado não era assim. Este ano, cada dia vale a permanência. Você aguentaria a pressão?\"", "semana": "5", "status": "A produzir", "stories": "", "titulo": "Novidade do formato: \"Todo dia, uma eliminação\""}, "2026-11-05": {"aprovado": true, "briefing": "Sequência de stories que complementa o reel de ontem (todo dia, uma eliminação).\nIdeia central: colocar o seguidor no lugar do participante e medir a pressão dele.\nImagens: trechos do reel de 04/11 e imagens de clima, sem participantes. Nenhuma prova é descrita.\n6 stories.", "capa": "", "date": "2026-11-05", "depende": "Trechos do reel de 04/11", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "Story 1: Repost de um trecho do reel de ontem, na fala \"cada fala pode ser a última\".\nTexto: \"Ficou na cabeça?\"\n\nStory 2: Fundo escuro, microfone no pedestal.\nTexto: \"Imagina: você sobe no palco sabendo que hoje alguém vai embora.\"\nSlider de emoji 😬: \"Seu nível de nervosismo agora\"\n\nStory 3: Enquete \"Você aguentaria uma eliminação por dia?\"\nOpções: \"Bora!\" / \"Nem pensar\"\n\nStory 4: Quiz \"O que pesa mais na hora de ficar?\"\nOpções: \"Conteúdo\" / \"Presença de palco\" / \"Emoção\" / \"Tudo junto\" (resposta: \"Tudo junto\")\n\nStory 5: Caixa de perguntas \"Que conselho você daria pra quem vai encarar essa pressão?\"\n(As melhores respostas podem ser repostadas na semana do reality.)\n\nStory 6: Fundo escuro.\nTexto: \"A pressão é real. E está chegando.\"", "semana": "5", "status": "A produzir", "stories": "", "titulo": "Sequência \"E se fosse você?\": a pressão da eliminação diária (complementa 04/11)"}, "2026-11-06": {"aprovado": true, "briefing": "Corte gerado no Opus Clip a partir dos 3 documentários de bastidor (30 s a 1min30).\nCuradoria: momento de emoção ou expectativa que funcione sozinho, sem precisar de contexto.\nEdição: legenda, identidade visual da temporada e frase de contexto na tela nos 3 primeiros segundos.", "capa": "Bastidores da Temporada #6", "date": "2026-11-06", "depende": "Biblioteca de cortes no Opus Clip", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "Definido pelo corte do Opus Clip.\nFrase de abertura sugerida na tela: \"Falta pouco\".", "semana": "5", "status": "A produzir", "stories": "", "titulo": "Corte de documentário: Bastidores da Temporada #6"}, "2026-11-07": {"aprovado": true, "briefing": "", "capa": "", "date": "2026-11-07", "depende": "", "fase": "1", "formato": "Stories", "responsavel": "", "roteiro": "", "semana": "5", "status": "A produzir", "stories": "", "titulo": "Caixa de perguntas \"O que faz você parar para ouvir alguém?\" + teaser \"domingo, o time responde a mesma pergunta\" (prepara 08/11)"}, "2026-11-08": {"aprovado": true, "briefing": "Reel com todo o time artístico respondendo à mesma pergunta: \"O que faz você parar para ouvir alguém?\".\nCada um grava de casa, em vídeo vertical, com resposta de 5 a 8 s. A edição alterna as respostas em ritmo rápido, como uma conversa entre eles.\nNão depende do estúdio: funciona como pausa antes da semana da montagem.\nNomes: Otaviano, Gabriela Prioli, Leandro Karnal, Luis Justo, Thiago Athanázio e Betty Agi.\nDuração: 45 a 60 s. Collab com o máximo de perfis do time que topar.", "capa": "Uma pergunta, seis respostas", "date": "2026-11-08", "depende": "Respostas gravadas pelo time", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Fundo escuro.\nTexto na tela: \"Uma pergunta. Seis respostas.\"\n\n[3–6 s] Otaviano, gravado em casa, faz a pergunta olhando para a câmera: \"O que faz você parar para ouvir alguém?\"\n\n[6–45 s] Respostas do time em sequência rápida, com nome na tela: Gabriela Prioli, Leandro Karnal, Luis Justo, Thiago Athanázio, Betty Agi.\nDica de edição: quando duas respostas se contradizem ou se completam, coloque uma ao lado da outra.\n\n[45–52 s] Resposta do Otaviano fechando a roda.\n\n[52–55 s] Texto: \"E pra você? Conta nos comentários.\" Logo.\n\nLegenda sugerida: \"Seis pessoas que vivem de palco respondendo à mesma pergunta. Qual resposta mais combinou com você?\"", "semana": "5", "status": "A produzir", "stories": "", "titulo": "\"Uma pergunta, seis respostas\": o time artístico responde, cada um de casa"}, "2026-11-13": {"aprovado": true, "briefing": "Dia da montagem do cenário. Reaproveitar o vídeo do espaço vazio do reel de 14/10 no antes e depois.\nTime-lapse da estrutura chegando e sendo montada ao longo do dia. Pedir ao Otaviano uma reação curta gravada em casa, assistindo às imagens.\nAinda sem citar o nome do local, até decidirmos quando revelar.\nDuração: 30 a 45 s.", "capa": "Começou a montagem", "date": "2026-11-13", "depende": "Montagem em andamento + reação do Otaviano gravada em casa", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–3 s] Estrutura chegando pela porta.\nTexto na tela: \"Começou.\"\n\n[3–10 s] Otaviano (off, gravado em casa): \"Lembra daquele espaço vazio?\" Tela dividida: espaço vazio do reel de 14/10 x hoje.\n\n[10–30 s] Time-lapse da montagem.\nOtaviano (off): \"Hoje o estúdio da nova temporada começou a ganhar forma.\"\n\n[30–38 s] Reação do Otaviano gravada em casa, assistindo às imagens: \"Gente, olha isso!\"\n\n[38–45 s] Texto: \"Amanhã, as luzes acendem.\"\n\nLegenda sugerida: \"De espaço vazio a estúdio em um dia. Amanhã você vê o resultado.\"", "semana": "6", "status": "A produzir", "stories": "", "titulo": "Montagem do estúdio: antes e depois + time-lapse"}, "2026-11-14": {"aprovado": true, "briefing": "O estúdio pronto, no dia em que ele vira de fato o palco do reality. Junta o que antes eram dois reels: projeto x realidade + luzes acendendo, e o fecho com a porta se fechando.\nGravar 2 ou 3 ângulos exatamente iguais aos dos 3Ds para as transições casadas. Nenhum participante aparece.\nA fala do Otaviano é gravada em casa antes, intercalada com o estúdio. Como ele chega fisicamente neste dia, existe a opção de regravar o fecho com ele no estúdio. [Decidir]\nA partir daqui, o que acontece lá dentro vira mistério. Sem datas.\nDuração: 40 a 50 s. Collab com o perfil do Otaviano.", "capa": "Está tudo pronto", "date": "2026-11-14", "depende": "Cenário montado + ângulos dos 3Ds + luz de show + fala do Otaviano", "fase": "1", "formato": "Reel", "responsavel": "", "roteiro": "[0–8 s] 3D de um ângulo com texto \"Projeto.\" Transição casada para o real no mesmo enquadramento, texto \"Realidade.\" Repetir com mais 1 ou 2 ângulos.\n\n[8–15 s] Estúdio escuro. Luzes acendendo uma a uma.\n\n[15–25 s] Câmera passeando pelo palco, pela mesa dos jurados e pela plateia vazia, com luz de show.\nOtaviano (off): \"Um estúdio. Uma mesa de jurados que o Brasil conhece. Um palco esperando.\"\n\n[25–40 s] Otaviano em quadro (gravado em casa, ou no estúdio se for regravado), intercalado com o palco:\n\"Da próxima vez que você me ver, vai ser aí dentro. E o que acontece lá fica lá… por enquanto.\"\n\n[40–45 s] Porta do estúdio fechando. Luz de \"gravando\" acende.\nTexto na tela: \"Nova temporada. Em breve.\"\n\nLegenda sugerida: \"Do 3D ao palco. As portas fecharam. O que acontece lá dentro, você vai descobrir aos poucos.\"", "semana": "6", "status": "A produzir", "stories": "", "titulo": "\"Está tudo pronto\": projeto x realidade, luzes acendendo e porta fechando"}};
+  posts=SNAPSHOT; canWrite=false; ready=true; render();
+})();
+</script>
+</body>
+</html>
